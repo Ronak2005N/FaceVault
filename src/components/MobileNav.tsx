@@ -29,6 +29,7 @@ export function MobileNav() {
                 { label: "Home", path: "/" },
                 { label: "Scan face", path: "/scan" },
                 { label: "Verify", path: "/verify" },
+                { label: "Wallet", path: "/wallet" },
               ].map((item) => (
                 <Link
                   key={item.path}

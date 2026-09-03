@@ -15,6 +15,7 @@ import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as ResultHashRouteImport } from './routes/result.$hash'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const VerifyRoute = VerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResultHashRoute = ResultHashRouteImport.update({
   id: '/result/$hash',
   path: '/result/$hash',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/scan': typeof ScanRoute
   '/verify': typeof VerifyRoute
+  '/wallet': typeof WalletRoute
   '/result/$hash': typeof ResultHashRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/scan': typeof ScanRoute
   '/verify': typeof VerifyRoute
+  '/wallet': typeof WalletRoute
   '/result/$hash': typeof ResultHashRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/scan': typeof ScanRoute
   '/verify': typeof VerifyRoute
+  '/wallet': typeof WalletRoute
   '/result/$hash': typeof ResultHashRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/scan'
     | '/verify'
+    | '/wallet'
     | '/result/$hash'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/scan'
     | '/verify'
+    | '/wallet'
     | '/result/$hash'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/scan'
     | '/verify'
+    | '/wallet'
     | '/result/$hash'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ScanRoute: typeof ScanRoute
   VerifyRoute: typeof VerifyRoute
+  WalletRoute: typeof WalletRoute
   ResultHashRoute: typeof ResultHashRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/result/$hash': {
       id: '/result/$hash'
       path: '/result/$hash'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ScanRoute: ScanRoute,
   VerifyRoute: VerifyRoute,
+  WalletRoute: WalletRoute,
   ResultHashRoute: ResultHashRoute,
 }
 export const routeTree = rootRouteImport

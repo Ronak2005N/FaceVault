@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useWallet } from "@/lib/hooks/useWallet";
-import { ArrowRight, ExternalLink, Shield, Search, Database, Lock, Eye, Globe } from "lucide-react";
+import { ArrowRight, ExternalLink, Shield, Search, Database, Lock, Eye, Globe, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileNav } from "@/components/MobileNav";
@@ -23,7 +23,7 @@ const stagger = {
 };
 
 function LandingPage() {
-  const { isConnected, connect, isConnecting, shortenAddress, address } = useWallet();
+  const { isConnected, shortenAddress, address } = useWallet();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -52,20 +52,19 @@ function LandingPage() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            {isConnected ? (
-              <div className="hidden items-center gap-2 rounded-md border border-success/30 bg-success/8 px-3 py-1.5 text-[11px] font-medium text-success tabular-nums sm:flex">
-                <span className="h-1 w-1 rounded-full bg-success" />
-                {shortenAddress(address)}
-              </div>
-            ) : (
-              <button
-                onClick={connect}
-                disabled={isConnecting}
-                className="hidden rounded-md bg-foreground px-4 py-1.5 text-[13px] font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50 sm:block"
-              >
-                {isConnecting ? "Connecting..." : "Connect Wallet"}
-              </button>
-            )}
+            <Link
+              to="/wallet"
+              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-all ${
+                isConnected
+                  ? "border border-success/30 bg-success/8 text-success"
+                  : "border border-border bg-card text-muted-foreground hover:text-foreground hover:shadow-sm"
+              }`}
+            >
+              <Wallet className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">
+                {isConnected ? shortenAddress(address) : "Connect"}
+              </span>
+            </Link>
             <MobileNav />
           </div>
         </div>

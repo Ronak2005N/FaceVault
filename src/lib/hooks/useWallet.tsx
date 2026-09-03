@@ -16,6 +16,7 @@ import type { WalletState } from "@/lib/blockchain/types";
 interface WalletContextType extends WalletState {
   isMetaMaskInstalled: boolean;
   connect: () => Promise<void>;
+  disconnect: () => void;
   switchNetwork: () => Promise<void>;
   shortenAddress: (addr: string) => string;
   refreshBalance: () => Promise<void>;
@@ -56,6 +57,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
+      // Revoke permissions first so MetaMask shows the approval popup
+      try {
+        await window.ethereum!.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] });
+      } catch {
+        // Ignore — older MetaMask versions may not support this
+      }
+
       const address = await connectWallet();
       const chainId = await getChainId();
       const balance = await getBalance(address);
@@ -86,33 +94,36 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    if (isMetaMaskInstalled()) {
-      window.ethereum!.request({ method: "eth_accounts" }).then((accounts) => {
-        if (accounts && (accounts as string[]).length > 0) {
-          connect();
-        }
-      });
-    }
-  }, [connect]);
+  const disconnect = useCallback(() => {
+    setWallet({ address: "", chainId: 0, balance: "0", isConnected: false, isAmoy: false });
+    setError(null);
+  }, []);
 
   useEffect(() => {
     listenToAccounts((accounts: string[]) => {
       if (accounts.length === 0) {
+        // User disconnected from MetaMask extension
         setWallet({ address: "", chainId: 0, balance: "0", isConnected: false, isAmoy: false });
-      } else {
-        connect();
       }
+      // Do NOT auto-connect on account change — user must click Connect
     });
 
     listenToChain(() => {
-      connect();
+      // Re-check connection status on chain change if already connected
+      setWallet((prev) => {
+        if (prev.isConnected) {
+          getChainId().then((chainId) => {
+            setWallet((p) => ({ ...p, chainId, isAmoy: chainId === POLYGON_AMOY.chainId }));
+          });
+        }
+        return prev;
+      });
     });
 
     return () => {
       removeListeners();
     };
-  }, [connect]);
+  }, []);
 
   return (
     <WalletContext.Provider
@@ -120,6 +131,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         ...wallet,
         isMetaMaskInstalled: isMetaMaskInstalled(),
         connect,
+        disconnect,
         switchNetwork,
         shortenAddress,
         refreshBalance,
